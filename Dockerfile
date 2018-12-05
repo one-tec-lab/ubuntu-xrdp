@@ -1,16 +1,14 @@
 FROM ubuntu:18.04 as builder
-MAINTAINER Daniel Guerra
 
 # Install packages
-
-ENV DEBIAN_FRONTEND noninteractive
-RUN sed -i "s/# deb-src/deb-src/g" /etc/apt/sources.list
-RUN apt-get -y update
-RUN apt-get -yy upgrade
 ENV BUILD_DEPS="git autoconf pkg-config libssl-dev libpam0g-dev \
     libx11-dev libxfixes-dev libxrandr-dev nasm xsltproc flex \
     bison libxml2-dev dpkg-dev libcap-dev"
-RUN apt-get -yy install  sudo apt-utils software-properties-common $BUILD_DEPS
+ENV DEBIAN_FRONTEND noninteractive
+RUN sed -i "s/# deb-src/deb-src/g" /etc/apt/sources.list && \ 
+    apt-get -y update  && \
+    apt-get -yy upgrade  && \
+    apt-get -yy install  sudo apt-utils software-properties-common $BUILD_DEPS
 
 
 # Build xrdp
@@ -36,6 +34,7 @@ RUN cp *.so /tmp/so
 FROM ubuntu:18.04
 ENV DEBIAN_FRONTEND noninteractive
 RUN apt-get -y update
+
 RUN apt install -yy vim wget ca-certificates xorgxrdp pulseaudio xrdp\
   xfce4 xfce4-terminal xfce4-screenshooter xfce4-taskmanager \
   xfce4-clipman-plugin xfce4-cpugraph-plugin xfce4-netload-plugin \

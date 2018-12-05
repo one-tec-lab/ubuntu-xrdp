@@ -3,13 +3,13 @@ services:
   terminalserver:
     build:
       context: .
-    image: danielguerra/ubuntu-xrdp
+    image: xrdp
     container_name: uxrdp
     hostname: terminalserver
     restart: always
     shm_size: 1g
     ports:
-      - "3389:3389"
+      - "3390:3389"
       - "2222:22"
     volumes:
       - ./data/ssh/:/etc/ssh/
