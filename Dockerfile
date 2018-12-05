@@ -25,11 +25,18 @@ RUN ./bootstrap
 RUN ./configure
 RUN make
 RUN make install
+
 WORKDIR /tmp/xrdp/sesman/chansrv/pulse
 RUN sed -i "s/\/tmp\/pulseaudio\-10\.0/\/tmp\/pulseaudio\-11\.1/g" Makefile
 RUN make
 RUN mkdir -p /tmp/so
 RUN cp *.so /tmp/so
+
+#----------------------------------
+
+
+
+
 
 FROM ubuntu:18.04
 ENV DEBIAN_FRONTEND noninteractive
@@ -46,6 +53,22 @@ COPY --from=builder /tmp/so/module-xrdp-sink.so /var/lib/xrdp-pulseaudio-install
 ADD bin /usr/bin
 ADD etc /etc
 #ADD pulse /usr/lib/pulse-10.0/modules/
+
+#------install apps ----------------
+RUN apt-get install curl xvfb software-properties-common apt-transport-https xdg-utils fonts-liberation libappindicator3-1 dpkg -y
+RUN wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+RUN dpkg -i google-chrome-stable_current_amd64.deb
+###### vs code
+RUN curl https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > microsoft.gpg
+RUN install -o root -g root -m 644 microsoft.gpg /etc/apt/trusted.gpg.d/
+RUN sh -c 'echo "deb [arch=amd64] https://packages.microsoft.com/repos/vscode stable main" > /etc/apt/sources.list.d/vscode.list'
+
+RUN apt-get update && apt-get install code -y 
+# or code-insiders
+######## pop icons
+RUN add-apt-repository ppa:system76/pop -y
+RUN apt-get update && apt-get install pop-icon-theme -y
+
 
 # Configure
 RUN mkdir /var/run/dbus
