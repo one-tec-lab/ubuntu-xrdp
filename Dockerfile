@@ -40,7 +40,7 @@ RUN cp *.so /tmp/so
 
 FROM ubuntu:18.04
 ENV DEBIAN_FRONTEND noninteractive
-RUN apt-get -y update
+RUN apt-get -y update && apt-get upgrade -y
 
 RUN apt install -yy vim wget ca-certificates xorgxrdp pulseaudio xrdp\
   xfce4 xfce4-terminal xfce4-screenshooter xfce4-taskmanager \
@@ -55,20 +55,26 @@ ADD etc /etc
 #ADD pulse /usr/lib/pulse-10.0/modules/
 
 #------install apps ----------------
-RUN apt-get install curl xvfb software-properties-common apt-transport-https xdg-utils fonts-liberation libappindicator3-1 dpkg -y
-RUN wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-RUN dpkg -i google-chrome-stable_current_amd64.deb
+RUN apt-get install curl software-properties-common apt-transport-https xdg-utils fonts-liberation libappindicator3-1 dpkg -y
+RUN add-apt-repository ppa:git-core/ppa -y
+#RUN wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+#RUN dpkg -i google-chrome-stable_current_amd64.deb && rm -rf google-chrome-stable_current_amd64.deb
 ###### vs code
 RUN curl https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > microsoft.gpg
 RUN install -o root -g root -m 644 microsoft.gpg /etc/apt/trusted.gpg.d/
 RUN sh -c 'echo "deb [arch=amd64] https://packages.microsoft.com/repos/vscode stable main" > /etc/apt/sources.list.d/vscode.list'
 
-RUN apt-get update && apt-get install code -y 
+RUN apt-get update && apt-get install code git synaptic -y 
 # or code-insiders
 ######## pop icons
 RUN add-apt-repository ppa:system76/pop -y
 RUN apt-get update && apt-get install pop-icon-theme -y
 
+RUN add-apt-repository ppa:numix/ppa \
+    && apt-get update \
+    && apt-get install --yes --force-yes --no-install-recommends numix-icon-theme numix-icon-theme-circle \
+    && apt-get clean \
+&& rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # Configure
 RUN mkdir /var/run/dbus
